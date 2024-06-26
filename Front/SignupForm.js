@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { TextInput, View, Text, TouchableOpacity } from 'react-native';
+import { TextInput, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { SignupFormstyles } from './styles/SignupFormstyles'; 
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { registerUser, checkUserID } from './Api';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+
 
 export default function SignupForm({ navigation }) {
   const [ID, setID] = useState('');
@@ -12,15 +14,80 @@ export default function SignupForm({ navigation }) {
   const [month, setMonth] = useState('');
   const [day, setDay] = useState('');
   const [gender, setGender] = useState(null);
+  const [isIDAvailable, setisIDAvailable] = useState(null);
 
-  const handleSignup = () => {
-    console.log('회원가입 정보:', { ID, password, confirmPassword, nickname, year, month, day, gender });
-    navigation.navigate('Login');
+  //생년월일(year,month,day) => type 변경 
+  const combineDate = (year, month, day) => {
+    const formattedMonth = month.padStart(2, '0');
+    const formattedDay = day.padStart(2, '0');
+    return `${year}-${formattedMonth}-${formattedDay} 00:00:00`;
+  
   };
+
+  const handleSignup = async () => {
+    if (isIDAvailable === false) {
+      Alert.alert('회원가입 실패', '아이디가 이미 사용 중입니다.', [
+        { text: '확인' }
+      ]);
+      return;
+    }
+
+    const birthdate = combineDate(year, month, day);
+    const userData = {
+      user_id: ID,
+      password: password,
+      password_check: confirmPassword,
+      user_nickname: nickname,
+      user_birth: birthdate,
+      user_gender: convertGender(gender),
+    };  
+ 
+    try {
+      const response = await registerUser(userData);
+      console.log(response);
+      Alert.alert('회원가입 성공', '회원가입이 성공적으로 완료되었습니다.', [
+        { text: '확인', onPress: () => navigation.navigate('Login') }
+      ]);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('회원가입 실패', '회원가입 중 오류가 발생했습니다.', [
+        { text: '확인' }
+      ]);
+    }
+  };
+ 
+  const handleCheckID = async () => {
+    try {
+      const response = await checkUserID(ID);
+      if (response.exists) {
+        setisIDAvailable(false);
+        Alert.alert('아이디 중복', '아이디가 이미 사용 중입니다.', [
+          { text: '확인' }
+        ]);
+      } else {
+        setisIDAvailable(true);
+        Alert.alert('아이디 사용 가능', '사용 가능한 아이디입니다.', [
+          { text: '확인' }
+        ]);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('오류', '아이디 중복 체크 중 오류가 발생했습니다.', [
+        { text: '확인' }
+      ]);
+    }
+  };
+
+  const convertGender = (gender) => { 
+    if (gender === 'Female') { return 'F'; } 
+    else if (gender === 'Male') { return 'M'; } 
+    else { return gender; }
+  };
+
 
   return (
     <SafeAreaProvider>
-      <View style={SignupFormstyles.container}>
+      <SafeAreaView style={SignupFormstyles.container}>
         <View style={SignupFormstyles.formContainer}>
           <Text style={SignupFormstyles.title}>회원가입</Text>
           <Text style={SignupFormstyles.subtitle}>On:ly 회원이 되어 다양한 혜택을 경험해 보세요!</Text>
@@ -34,10 +101,10 @@ export default function SignupForm({ navigation }) {
               onChangeText={setID}
               autoCapitalize="none"
             />
-            <TouchableOpacity style={SignupFormstyles.checkButtonContainer}>
-                <View style={SignupFormstyles.checkButton}>
-                  <Text style={SignupFormstyles.checkButtonText}>중복 확인</Text>
-                </View>
+            <TouchableOpacity style={SignupFormstyles.checkButtonContainer} onPress={handleCheckID}>
+              <View style={SignupFormstyles.checkButton}>
+                <Text style={SignupFormstyles.checkButtonText}>중복 확인</Text>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -130,7 +197,7 @@ export default function SignupForm({ navigation }) {
               </View>
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
-}
+  }
