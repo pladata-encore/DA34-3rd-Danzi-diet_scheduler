@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
+import { FoodContext } from './FoodContext'; // 생성한 FoodContext 임포트
 import styles from './styles_text';
 
 const Add_Text = () => {
+  const { addFoodItem } = useContext(FoodContext);
   const [foodName, setFoodName] = useState('');
   const [calories, setCalories] = useState('');
   const [weight, setWeight] = useState('');
@@ -12,16 +14,27 @@ const Add_Text = () => {
   const [protein, setProtein] = useState('');
   const [fat, setFat] = useState('');
   const navigation = useNavigation();
+  const route = useRoute();
+  const isFocused = useIsFocused(); // 현재 화면이 포커스되었는지 확인
+
+  const date = route.params?.date || new Date().toISOString().split('T')[0]; // 기본값 설정
+
+  useEffect(() => {
+    if (isFocused) {
+      // 화면이 포커스될 때 상태 초기화
+      setFoodName('');
+      setCalories('');
+      setWeight('');
+      setCarbohydrates('');
+      setProtein('');
+      setFat('');
+    }
+  }, [isFocused]);
 
   const handleSubmit = () => {
-    navigation.navigate('FoodList', {
-      foodName,
-      calories,
-      weight,
-      carbohydrates,
-      protein,
-      fat,
-    });
+    const foodItem = { date, foodName, calories, weight, carbohydrates, protein, fat };
+    addFoodItem(date, foodItem); // 날짜와 함께 컨텍스트에 음식 정보 추가
+    navigation.navigate('FoodList', { date }); // FoodList 화면으로 이동할 때 날짜 전달
   };
 
   const goHome = () => {
@@ -38,6 +51,10 @@ const Add_Text = () => {
 
   const viewProfile = () => {
     navigation.navigate('Profile'); // Assuming there's a 'Profile' screen
+  };
+
+  const isFormValid = () => {
+    return foodName && calories && weight && carbohydrates && protein && fat;
   };
 
   return (
@@ -73,7 +90,11 @@ const Add_Text = () => {
               );
             })}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
+              <TouchableOpacity
+                style={[styles.saveButton, { backgroundColor: isFormValid() ? '#00adf5' : '#d3d3d3' }]} //모든 값들이 다 들어가 있어야 완료 버튼 눌러짐
+                onPress={handleSubmit}
+                disabled={!isFormValid()}
+              >
                 <Text style={styles.saveButtonText}>완료</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>

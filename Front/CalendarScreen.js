@@ -1,22 +1,76 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './styles_calendar';
 import { useNavigation } from '@react-navigation/native';
+import { FoodContext } from './FoodContext';
+import moment from 'moment';
 
 const CalendarScreen = () => {
   const navigation = useNavigation();
   const [refresh, setRefresh] = useState(false);
+  const { foodItems } = useContext(FoodContext);
+  const [markedDates, setMarkedDates] = useState({});
+  const today = moment().format('YYYY-MM-DD');
+
+  useEffect(() => {
+    const newMarkedDates = {};
+    Object.keys(foodItems).forEach(date => {
+      newMarkedDates[date] = {
+        marked: true,
+        customStyles: {
+          container: {
+            backgroundColor: 'transparent'
+          },
+          text: {
+            color: 'transparent'
+          }
+        }
+      };
+    });
+    setMarkedDates(newMarkedDates);
+  }, [foodItems]);
 
   const handleDayPress = (day) => {
-    console.log('selected day', day);
-    navigation.navigate('Cal', { date: day.dateString });
+    const date = day.dateString;
+    if (moment(date).isAfter(today)) {
+      return; // 오늘 이후 날짜는 터치해도 아무 동작하지 않음
+    }
+    if (foodItems[date] && foodItems[date].length > 0) {
+      navigation.navigate('FoodList', { date });
+    } else {
+      navigation.navigate('Cal', { date });
+    }
+  };
+
+  const renderCustomMarking = (date) => {
+    const hasData = foodItems[date];
+    if (moment(date).isSameOrBefore(today)) {
+      return (
+        <Image
+          source={hasData ? require('./assets/heart_cat.png') : require('./assets/angry_cat.png')}
+          style={{ width: 20, height: 20, alignSelf: 'center', marginTop: 5 }}
+        />
+      );
+    }
+    return null;
   };
 
   const viewCalendar = () => {
-    // Trigger re-render by toggling the refresh state
     setRefresh(!refresh);
+  };
+
+  const goHome = () => {
+    navigation.navigate('Home');
+  };
+
+  const viewStats = () => {
+    navigation.navigate('Stats');
+  };
+
+  const viewProfile = () => {
+    navigation.navigate('Profile');
   };
 
   return (
@@ -34,6 +88,18 @@ const CalendarScreen = () => {
         onPressArrowLeft={(subtractMonth) => subtractMonth()}
         onPressArrowRight={(addMonth) => addMonth()}
         enableSwipeMonths={true}
+        markingType={'custom'}
+        markedDates={markedDates}
+        dayComponent={({ date, state, marking }) => (
+          <TouchableOpacity
+            onPress={() => handleDayPress(date)}
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+            disabled={moment(date.dateString).isAfter(today)} // 오늘 이후 날짜 비활성화
+          >
+            <Text style={{ textAlign: 'center', color: state === 'disabled' ? 'gray' : 'black' }}>{date.day}</Text>
+            {renderCustomMarking(date.dateString)}
+          </TouchableOpacity>
+        )}
         theme={{
           textSectionTitleColor: '#b6c1cd',
           textSectionTitleDisabledColor: '#d9e1e8',
@@ -111,17 +177,5 @@ const CalendarScreen = () => {
     </SafeAreaView>
   );
 };
-
-function goHome() {
-  alert('홈으로 이동');
-}
-
-function viewStats() {
-  alert('통계 보기');
-}
-
-function viewProfile() {
-  alert('프로필 보기');
-}
 
 export default CalendarScreen;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, View, TouchableOpacity, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
@@ -10,6 +10,8 @@ export default function Cal() {
   const [showOptions, setShowOptions] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null); // State to hold the selected image URI
   const navigation = useNavigation();
+  const route = useRoute();
+  const { date } = route.params; // 선택한 날짜를 받아옴
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
@@ -19,7 +21,7 @@ export default function Cal() {
     setShowOptions(false);
 
     if (option === 'text') {
-      navigation.navigate('AddText');
+      navigation.navigate('AddText', { date });
     } else if (option === 'camera') {
       await openCamera();
     } else if (option === 'gallery') {
@@ -125,6 +127,10 @@ export default function Cal() {
 
   const viewProfile = () => {
     navigation.navigate('Profile');
+  };
+
+  const handleAddText = () => {
+    navigation.navigate('AddText', { date });
   };
 
   return (

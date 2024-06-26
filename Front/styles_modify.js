@@ -80,7 +80,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 20,
+    marginTop: 10,
   },
   saveButton: {
     backgroundColor: '#A481D0',
