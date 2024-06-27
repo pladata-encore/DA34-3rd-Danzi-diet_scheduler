@@ -44,7 +44,7 @@ const FoodListModify = ({ route }) => {
   };
 
   const goHome = () => {
-    navigation.navigate('Home'); // Assuming there's a 'Home' screen
+    navigation.navigate('MainPage'); // Assuming there's a 'Home' screen
   };
 
   const viewCalendar = () => {
@@ -56,7 +56,7 @@ const FoodListModify = ({ route }) => {
   };
 
   const viewProfile = () => {
-    navigation.navigate('Profile'); // Assuming there's a 'Profile' screen
+    navigation.navigate('MyPage'); // Assuming there's a 'Profile' screen
   };
 
   return (

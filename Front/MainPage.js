@@ -55,7 +55,7 @@ export default function MainPage({ navigation }) {
         </View>
 
         <View style={MainPagestyles.menuBar}>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <TouchableOpacity onPress={() => navigation.navigate('MainPage')}>
             <Image source={require('./assets/home.png')} style={MainPagestyles.icon} />
           </TouchableOpacity>
 

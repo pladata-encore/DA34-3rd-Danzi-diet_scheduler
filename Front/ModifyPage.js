@@ -26,7 +26,7 @@
     };
 
     const startDiet = () => {
-      navigation.navigate('MainPage'); // MainPage로 이동
+      navigation.navigate('MyPage'); // MainPage로 이동
     };
     const getActivityDescription = () => {
       if (modactivity === 0) {

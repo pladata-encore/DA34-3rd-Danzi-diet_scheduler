@@ -114,7 +114,7 @@ export default function Cal() {
   };
 
   const goHome = () => {
-    navigation.navigate('Home');
+    navigation.navigate('MainPage');
   };
 
   const viewCalendar = () => {
@@ -126,7 +126,7 @@ export default function Cal() {
   };
 
   const viewProfile = () => {
-    navigation.navigate('Profile');
+    navigation.navigate('MyPage');
   };
 
   const handleAddText = () => {

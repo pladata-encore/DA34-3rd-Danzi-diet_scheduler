@@ -10,7 +10,7 @@ export const MyPagestyles = StyleSheet.create({
     header: {
       justifyContent: 'center', 
       alignItems: 'center',
-      backgroundColor: '#D6BDF6',
+      backgroundColor: '#A481D0',
       width: '100%',
       padding: 8,
       marginBottom: 4,
@@ -18,7 +18,7 @@ export const MyPagestyles = StyleSheet.create({
     },
     title: {
       textAlign: 'center',
-      fontSize: 18,
+      fontSize: 20,
       color: 'black',
       fontWeight: 'bold',
       padding: 10,

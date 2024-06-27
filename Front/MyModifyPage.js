@@ -23,9 +23,8 @@ export default function MyModify({ navigation }) {
       color: '#e3e1e1',
   };
     const startDiet = () => {
-      navigation.navigate('MainPage'); // MainPage로 이동
+      navigation.navigate('MyPage'); // MainPage로 이동
 };
-
 
     return (
       <SafeAreaProvider>

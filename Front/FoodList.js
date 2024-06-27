@@ -234,7 +234,7 @@ const FoodList = () => {
   };
 
   const goHome = () => {
-    navigation.navigate('Home');
+    navigation.navigate('MainPage');
   };
 
   const viewCalendar = () => {
@@ -246,7 +246,7 @@ const FoodList = () => {
   };
 
   const viewProfile = () => {
-    navigation.navigate('Profile');
+    navigation.navigate('MyPage');
   };
 
   return (

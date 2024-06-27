@@ -105,23 +105,4 @@ export default StyleSheet.create({
     width: 30,
     height: 30,
   },
-  navigation: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#ffffff',
-    borderTopWidth: 4,
-    borderTopColor: '#D6BDF6',
-    paddingVertical: 30,
-  },
-  navButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navButtonImage: {
-    width: 30,
-    height: 30,
-  },
 });

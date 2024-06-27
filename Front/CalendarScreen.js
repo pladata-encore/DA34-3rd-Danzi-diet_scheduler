@@ -62,7 +62,7 @@ const CalendarScreen = () => {
   };
 
   const goHome = () => {
-    navigation.navigate('Home');
+    navigation.navigate('MainPage');
   };
 
   const viewStats = () => {
@@ -70,7 +70,7 @@ const CalendarScreen = () => {
   };
 
   const viewProfile = () => {
-    navigation.navigate('Profile');
+    navigation.navigate('MyPage');
   };
 
   return (

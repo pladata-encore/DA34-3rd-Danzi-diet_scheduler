@@ -110,7 +110,7 @@ export default function MyPage({ navigation }) {
 
 
       <View style={MyPagestyles.menuBar}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('MainPage')}>
           <Image source={require('./assets/home.png')} style={MyPagestyles.icon} />
         </TouchableOpacity>
 
