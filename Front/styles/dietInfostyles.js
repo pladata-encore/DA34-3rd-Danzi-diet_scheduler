@@ -77,8 +77,19 @@ export const DietInfostyles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-
-
+  recommendationContainer: {
+    height: 40,
+    width: windowWidth * 0.8,
+    marginBottom: 20,
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    borderRadius: 10,
+    backgroundColor: '#e1ff00',
+  },
+  recommendationText: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
 
 
 });

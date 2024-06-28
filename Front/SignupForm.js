@@ -4,7 +4,6 @@ import { SignupFormstyles } from './styles/SignupFormstyles';
 import { registerUser, checkUserID } from './Api';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
-
 export default function SignupForm({ navigation }) {
   const [ID, setID] = useState('');
   const [password, setPassword] = useState('');
