@@ -418,7 +418,7 @@ const FoodList = () => {
   };
 
   const viewStats = () => {
-    navigation.navigate('Stats');
+    navigation.navigate('Insight');
   };
 
   const viewProfile = () => {

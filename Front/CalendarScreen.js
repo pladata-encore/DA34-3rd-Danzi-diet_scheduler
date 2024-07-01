@@ -205,7 +205,7 @@ const CalendarScreen = () => {
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Calendar')}>
           <Image source={require('./assets/calendar.png')} style={styles.navButtonImage} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Stats')}>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Insight')}>
           <Image source={require('./assets/insight.png')} style={styles.navButtonImage} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('MyPage')}>

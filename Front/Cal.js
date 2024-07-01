@@ -167,7 +167,7 @@ export default function Cal() {
   };
 
   const viewStats = () => {
-    navigation.navigate('Stats');
+    navigation.navigate('Insight');
   };
 
   const viewProfile = () => {

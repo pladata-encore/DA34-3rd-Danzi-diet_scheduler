@@ -28,7 +28,7 @@ export default function Login_typing({ navigation }) {
         } else {
           navigation.navigate('MainPage');
         }
-        Alert.alert('로그인 성공', '로그인이 성공적으로 완료되었습니다.');
+        // Alert.alert('로그인 성공', '로그인이 성공적으로 완료되었습니다.');
       } else {
         Alert.alert('로그인 실패', '아이디 또는 비밀번호가 잘못되었습니다.', [
           { text: '확인' }

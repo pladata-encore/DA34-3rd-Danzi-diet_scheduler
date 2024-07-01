@@ -86,7 +86,7 @@ const Add_Text = () => {
   };
 
   const viewStats = () => {
-    navigation.navigate('Stats'); // Assuming there's a 'Stats' screen
+    navigation.navigate('Insight'); // Assuming there's a 'Stats' screen
   };
 
   const viewProfile = () => {
