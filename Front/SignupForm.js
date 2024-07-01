@@ -3,6 +3,7 @@ import { TextInput, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { SignupFormstyles } from './styles/SignupFormstyles'; 
 import { registerUser, checkUserID } from './Api';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage'; //storage에 user정보 저장 (MyModify에 데이터 불러와야해서)
 
 export default function SignupForm({ navigation }) {
   const [ID, setID] = useState('');
@@ -44,6 +45,10 @@ export default function SignupForm({ navigation }) {
     try {
       const response = await registerUser(userData);
       console.log(response);
+
+      // 사용자 정보를 AsyncStorage에 저장
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+      
       Alert.alert('회원가입 성공', '회원가입이 성공적으로 완료되었습니다.', [
         { text: '확인', onPress: () => navigation.navigate('Login') }
       ]);

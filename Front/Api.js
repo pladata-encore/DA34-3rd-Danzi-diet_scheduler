@@ -1,6 +1,5 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import DietInfo from './dietInfo';
 
 // Django 서버 주소
 const config = require('./config');
@@ -25,6 +24,20 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 응답 인터셉터 설정 (토큰 만료 처리)
+apiClient.interceptors.response.use(
+  response => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      await AsyncStorage.removeItem('accessToken');  // 토큰 삭제
+      return Promise.reject(new Error('토큰이 만료되었습니다. 다시 로그인해주세요.'));
+    }
     return Promise.reject(error);
   }
 );
@@ -75,6 +88,42 @@ export const logoutUser = async () => {
     }
 };
 
+//회원탈퇴
+export const userdelete = async () => {
+    try {
+      const response = await apiClient.delete('/user/delete/');
+      await AsyncStorage.removeItem('accessToken');
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+};
+
+//mainpage (user정보+현재까지 먹은 칼로리 정보)
+export const mainInfo = async (date) => {
+  try {
+    const userInfoResponse = await apiClient.get('/user/diet_info/');
+    const mealInfoREsponse = await apiClient.get('/diet/daily_meals/by-date/', { params: { date }});
+    return {
+      ...userInfoResponse.data,
+      ...mealInfoREsponse.data,
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// 사용자 정보 수정(MyModifyPage 수정하면 서버 업로드)
+export const updateUser = async (userData) => {
+  try {
+    const response = await apiClient.put('/user/member/', userData);
+    console.log('new_user:', userData)
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 // 다이어트 정보 전송 + 다이어트 기간 추천 
 export const submitDietInfo = async (dietData) => {
   try {
@@ -86,7 +135,7 @@ export const submitDietInfo = async (dietData) => {
   }
 };
 
-//Mypage 회원 + 다이어트 정보 api 불러오기
+//Mypage 회원 + 다이어트 정보 api 불러오기 + Modify 2page 수정 
 export const mydietinfo = async () => {
   try {
     const memberResponse = await apiClient.get('/user/member/');
@@ -96,11 +145,13 @@ export const mydietinfo = async () => {
     console.log('DietResponse:', dietResponse.data);
  
     const userInfo = {
+      user_id: memberResponse.data.user_id,
       user_nickname: memberResponse.data.user_nickname,
       user_gender: memberResponse.data.user_gender,
       user_birth: memberResponse.data.user_birth,
       height: memberResponse.data.height,
-      weight: memberResponse.data.weight,  //회원정보api 가져오는 정보
+      weight: memberResponse.data.weight,  
+      activity: memberResponse.data.activity,  //회원정보api 가져오는 정보
       goal_weight: dietResponse.data.goal_weight,
       start_dt: dietResponse.data.start_dt,
       goal_dt: dietResponse.data.goal_dt,

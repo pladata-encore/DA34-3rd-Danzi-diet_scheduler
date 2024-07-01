@@ -42,7 +42,7 @@ export const MyModifyPagestyles  = StyleSheet.create({
     },
     inputBirth: {
       height: 40,
-      width: windowWidth * 0.25,
+      width: windowWidth * 0.8,
       borderColor: 'gray',
       borderWidth: 1,
       borderRadius: 10,
@@ -80,15 +80,6 @@ export const MyModifyPagestyles  = StyleSheet.create({
     birthContainer: {
       flexDirection: 'column',
       marginBottom: 20,
-    },
-    inputBirth: {
-      height: 40,
-      width: windowWidth * 0.25,
-      borderColor: 'gray',
-      borderWidth: 1,
-      borderRadius: 10,
-      paddingHorizontal: 10,
-      backgroundColor: '#FFFFFF',
     },
     buttonContainer:{
       flexDirection: 'column',

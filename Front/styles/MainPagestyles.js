@@ -18,7 +18,7 @@ export const MainPagestyles  = StyleSheet.create({
     top: 0, // 화면 맨 위쪽에 위치
   },
   dday:{
-    fontSize: 50,
+    fontSize: 60,
     color: 'white',
   },
   successday: {
@@ -86,6 +86,25 @@ export const MainPagestyles  = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   icon: {
+    width: 30,
+    height: 30,
+  },
+  navigation: {
+    position: 'absolute',
+    bottom: 0,
+    width: '110%',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#ffffff',
+    borderTopWidth: 4,
+    borderTopColor: '#D6BDF6',
+    paddingVertical: 30,
+  },
+  navButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navButtonImage: {
     width: 30,
     height: 30,
   },

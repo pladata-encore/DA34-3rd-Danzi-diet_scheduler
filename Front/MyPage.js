@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { MyPagestyles } from './styles/Mypagestyles'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { mydietinfo } from './Api';
+import { mydietinfo, logoutUser, userdelete } from './Api';
 
 // 성별 변환 함수
 const getGenderLabel = (gender) => {
@@ -55,17 +56,57 @@ export default function MyPage({ navigation }) {
     daily_kcal: '', //다이어트api 가져오는 정보 
   });
 
-  useEffect(() => {
-    const fetchData = async() => {
-      const data = await mydietinfo();
-      setUserInfo(data);
-    };
-    fetchData();
-  }, []);
 
-  // 로그아웃 버튼 누르면 로그인 화면으로 이동 
-  const handleLogout = () => {
-    navigation.navigate('Login'); 
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        const data = await mydietinfo();
+        setUserInfo(data);
+      };
+      fetchData();
+    }, [])
+  );
+
+
+  // 로그아웃 버튼 누르면 로그인 화면으로 이동
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      navigation.navigate('Login');
+    } catch (error) {
+      Alert.alert('오류', '로그아웃 중 오류가 발생했습니다.', [
+        { text: '확인' }
+      ]);
+    }
+  };
+
+  // 회원탈퇴 버튼 누르면 확인 후 회원탈퇴 처리
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      '회원탈퇴',
+      '정말로 회원탈퇴 하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: async () => {
+            try {
+              await userdelete();
+              navigation.navigate('Login');
+            } catch (error) {
+              Alert.alert('오류', '회원탈퇴 중 오류가 발생했습니다.', [
+                { text: '확인' }
+              ]);
+            }
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -119,7 +160,7 @@ export default function MyPage({ navigation }) {
         <TouchableOpacity style={MyPagestyles.button} onPress={handleLogout}>
           <Text style={MyPagestyles.buttonText}>로그아웃</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={MyPagestyles.button}>
+        <TouchableOpacity style={MyPagestyles.button} onPress={handleDeleteAccount}>
           <Text style={MyPagestyles.buttonText}>회원탈퇴</Text>
         </TouchableOpacity>
       </View>
@@ -137,21 +178,18 @@ export default function MyPage({ navigation }) {
       </View>
 
 
-      <View style={MyPagestyles.menuBar}>
-        <TouchableOpacity onPress={() => navigation.navigate('MainPage')}>
-          <Image source={require('./assets/home.png')} style={MyPagestyles.icon} />
+      <View style={MyPagestyles.navigation}>
+        <TouchableOpacity style={MyPagestyles.navButton} onPress={() => navigation.navigate('MainPage')}>
+          <Image source={require('./assets/home.png')} style={MyPagestyles.navButtonImage} />
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Calendar')}>
-          <Image source={require('./assets/calendar.png')} style={MyPagestyles.icon} />
+        <TouchableOpacity style={MyPagestyles.navButton} onPress={() => navigation.navigate('Calendar')}>
+          <Image source={require('./assets/calendar.png')} style={MyPagestyles.navButtonImage} />
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Insight')}>
-          <Image source={require('./assets/insight.png')} style={MyPagestyles.icon} />
+        <TouchableOpacity style={MyPagestyles.navButton} onPress={() => navigation.navigate('Insight')}>
+          <Image source={require('./assets/insight.png')} style={MyPagestyles.navButtonImage} />
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('MyPage')}>
-          <Image source={require('./assets/profile.png')} style={MyPagestyles.icon} />
+        <TouchableOpacity style={MyPagestyles.navButton} onPress={() => navigation.navigate('MyPage')}>
+          <Image source={require('./assets/profile.png')} style={MyPagestyles.navButtonImage} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>

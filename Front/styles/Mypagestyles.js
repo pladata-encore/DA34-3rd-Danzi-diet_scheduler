@@ -12,7 +12,7 @@ export const MyPagestyles = StyleSheet.create({
       alignItems: 'center',
       backgroundColor: '#A481D0',
       width: '100%',
-      padding: 8,
+      padding: 10,
       marginBottom: 4,
       borderRadius: 8,
     },
@@ -72,6 +72,7 @@ export const MyPagestyles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginBottom: 5,
+      padding: 13,
     },
     button: {
       width: '48%',
@@ -88,31 +89,39 @@ export const MyPagestyles = StyleSheet.create({
     Mymodify: {
       position: 'absolute',   //특정위치에 고정시키기 위해 사용 
       right: 25,   //right, top: 방향키 역할 
-      top: 90,
+      top: 95,
       width: 30,
       height: 30,
     },
     dietmodify: {
       position: 'absolute',   //특정위치에 고정시키기 위해 사용 
       right: 25,   //right, top: 방향키 역할 
-      top: 340,
+      top: 350,
       width: 30,
       height: 30,
     },    
-    menuBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      alignItems: 'center',
-      height: 60,
-      width: '100%',
-      position: 'absolute',
-      bottom: 0,
-      backgroundColor: '#ffffff',
-    },
     icon: {
       width: 30,
       height: 30,
     },
-
+    navigation: {
+      position: 'absolute',
+      bottom: 0,
+      width: '110%',
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      backgroundColor: '#ffffff',
+      borderTopWidth: 4,
+      borderTopColor: '#D6BDF6',
+      paddingVertical: 30,
+    },
+    navButton: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    navButtonImage: {
+      width: 30,
+      height: 30,
+    },
 }
 )
