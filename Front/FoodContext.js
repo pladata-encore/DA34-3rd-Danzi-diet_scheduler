@@ -25,3 +25,4 @@ export const FoodProvider = ({ children }) => {
     </SafeAreaProvider>
   );
 };
+

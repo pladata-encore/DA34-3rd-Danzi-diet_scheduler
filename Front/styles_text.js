@@ -95,7 +95,7 @@ export default StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 4,
     borderTopColor: '#D6BDF6',
-    paddingVertical: 10,
+    paddingVertical: 30,
   },
   navButton: {
     alignItems: 'center',

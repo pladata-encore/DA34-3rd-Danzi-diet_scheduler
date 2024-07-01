@@ -1,13 +1,15 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, FlatList, Image, Alert, ScrollView } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Dimensions, FlatList, Image, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import Svg, { G, Path, Text as SvgText } from 'react-native-svg';
 import CalendarStrip from 'react-native-calendar-strip';
 import styles from './styles_foodlist';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { FoodContext } from './FoodContext';
+import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('screen');
 
@@ -16,13 +18,99 @@ const FoodList = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedFoodName, setSelectedFoodName] = useState('전체 메뉴');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
-  const { date } = route.params;
-  const foodForDate = foodItems[date] || [];
-  const [selectedImage, setSelectedImage] = useState(null);
+  const { date: initialDate, dietSeq } = route.params;
+  const [selectedDate, setSelectedDate] = useState(initialDate);
+  const [menuItems, setMenuItems] = useState([{ id: '0', name: '전체 메뉴' }]);
+  const foodForDate = foodItems[selectedDate] || [];
 
-  const menuItems = [{ id: '0', name: '전체 메뉴' }, ...foodForDate.map((item, index) => ({ id: String(index + 1), name: item.foodName }))];
+  useFocusEffect(
+    React.useCallback(() => {
+      setSelectedDate(initialDate);
+      fetchData(initialDate);
+    }, [initialDate])
+  );
+
+  const fetchData = async (date) => {
+    setLoading(true);
+    try {
+      await fetchMenuItems(date);
+      await fetchFoodItems(date);
+    } catch (error) {
+      Alert.alert('Error', '데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const fetchFoodItems = async (date) => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+      const foodResponse = await fetch(`http://ec2-43-203-68-109.ap-northeast-2.compute.amazonaws.com:8000/diet/meals/by-date/?date=${date}T00:00:00Z`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (foodResponse.ok) {
+        const foodResult = await foodResponse.json();
+        setFoodItems(prevItems => ({ ...prevItems, [date]: foodResult }));
+        
+        const newMenuItems = foodResult.map((item, index) => ({
+          id: `${date}-${index + 1}`, // 고유한 id 생성
+          name: item.name,
+          kcal: item.kcal,
+          carbo: item.carbo,
+          protein: item.protein,
+          prov: item.prov,
+          dietSeq: item.diet_seq, // 추가
+        }));
+
+        setMenuItems([{ id: '0', name: '전체 메뉴' }, ...newMenuItems]);
+      } else {
+        const errorData = await foodResponse.json();
+        // Alert.alert('Error', errorData.error); (1)
+      }
+    } catch (error) {
+      // Alert.alert('Error', error.message); (2)
+    }
+  };
+
+  const fetchMenuItems = async (date) => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+      const menuResponse = await fetch(`http://ec2-43-203-68-109.ap-northeast-2.compute.amazonaws.com:8000/diet/daily_meals/by-date/?date=${date}T00:00:00Z`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (menuResponse.ok) {
+        const menuResult = await menuResponse.json();
+        setMenuItems([{ id: '0', name: '전체 메뉴' }, ...menuResult]);
+      } else {
+        const errorData = await menuResponse.json();
+        // Alert.alert('Error', errorData.error); (3)
+      }
+    } catch (error) {
+      // Alert.alert('Error', error.message); (4)
+    }
+  };
 
   const handleMenuToggle = () => {
     setMenuVisible(!menuVisible);
@@ -41,7 +129,7 @@ const FoodList = () => {
     setShowOptions(false);
 
     if (option === 'text') {
-      navigation.navigate('AddText', { date });
+      navigation.navigate('AddText', { date: selectedDate });
     } else if (option === 'camera') {
       await openCamera();
     } else if (option === 'gallery') {
@@ -81,8 +169,7 @@ const FoodList = () => {
       });
 
       console.log('Selected camera image saved to:', newPath);
-      Alert.alert('카메라 이미지', `이미지가 저장되었습니다`);
-      setSelectedImage(newPath);
+      await handleImageUpload(newPath);
     } catch (error) {
       console.error('카메라 실행 중 오류 발생:', error);
       Alert.alert('오류', '카메라를 여는 도중 문제가 발생했습니다.');
@@ -125,25 +212,93 @@ const FoodList = () => {
       });
 
       console.log('Selected gallery image saved to:', newPath);
-      Alert.alert('갤러리 이미지', `이미지가 저장되었습니다`);
-      setSelectedImage(newPath);
+      await handleImageUpload(newPath);
     } catch (error) {
       console.error('Error saving the image:', error);
       Alert.alert('저장 오류', '이미지를 저장하는 데 실패했습니다.');
     }
   };
 
-  const selectedItem = foodForDate.find(item => item.foodName === selectedFoodName) || {};
+  const handleImageUpload = async (imagePath) => {
+    try {
+      const formData = new FormData();
+      formData.append('img', {
+        uri: imagePath,
+        name: imagePath.split('/').pop(),
+        type: 'image/jpeg'
+      });
+
+      const token = await AsyncStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+      const response = await fetch('http://ec2-43-203-68-109.ap-northeast-2.compute.amazonaws.com:8000/diet/record/image/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('네트워크 응답이 올바르지 않습니다.');
+      }
+
+      const data = await response.json();
+      navigation.navigate('AddText', {
+        date: selectedDate,
+        foodName: data.food_name,
+        calories: data.calories,
+        weight: data.weight,
+        carbohydrates: data.carbohydrate,
+        protein: data.protein,
+        fat: data.fat,
+        dietSeq: data.diet_seq
+      });
+    } catch (error) {
+      console.error('이미지 업로드 중 오류 발생:', error);
+      Alert.alert('오류', '이미지를 업로드하는 도중 문제가 발생했습니다.');
+    }
+  };
+
+  const handleDateSelect = async (date) => {
+    const formattedDate = moment(date).format('YYYY-MM-DD');
+    setSelectedDate(formattedDate);
+    await fetchData(formattedDate);
+
+    const foodForNewDate = foodItems[formattedDate] || [];
+    if (foodForNewDate.length === 0) {
+      navigation.navigate('Cal', { date: formattedDate });
+    } else {
+      // 이미 데이터가 있는 경우 Cal로 이동하지 않고 현재 화면을 유지
+      navigation.navigate('FoodList', { date: formattedDate });
+    }
+  };
+
+  const selectedItem = menuItems.find(item => item.name === selectedFoodName) || {};
+
+  const totalData = foodForDate.reduce(
+    (acc, item) => {
+      acc.kcal += item.kcal || 0;
+      acc.carbo += item.carbo || 0;
+      acc.protein += item.protein || 0;
+      acc.prov += item.prov || 0;
+      return acc;
+    },
+    { kcal: 0, carbo: 0, protein: 0, prov: 0 }
+  );
 
   const data = selectedFoodName === '전체 메뉴'
     ? [
-        { key: '지방', amount: foodForDate.reduce((sum, item) => sum + Number(item.fat || 0), 0), color: '#FB9AD1' },
-        { key: '탄수화물', amount: foodForDate.reduce((sum, item) => sum + Number(item.carbohydrates || 0), 0), color: '#8644A2' },
-        { key: '단백질', amount: foodForDate.reduce((sum, item) => sum + Number(item.protein || 0), 0), color: '#BC7FCD' },
+        { key: '지방', amount: totalData.prov, color: '#FB9AD1' },
+        { key: '탄수화물', amount: totalData.carbo, color: '#8644A2' },
+        { key: '단백질', amount: totalData.protein, color: '#BC7FCD' },
       ]
     : [
-        { key: '지방', amount: Number(selectedItem.fat || 0), color: '#FB9AD1' },
-        { key: '탄수화물', amount: Number(selectedItem.carbohydrates || 0), color: '#8644A2' },
+        { key: '지방', amount: Number(selectedItem.prov || 0), color: '#FB9AD1' },
+        { key: '탄수화물', amount: Number(selectedItem.carbo || 0), color: '#8644A2' },
         { key: '단백질', amount: Number(selectedItem.protein || 0), color: '#BC7FCD' },
       ];
 
@@ -195,25 +350,46 @@ const FoodList = () => {
     );
   });
 
-  const handleDeletePress = () => {
+  const handleDeletePress = async () => {
     Alert.alert(
       "정말로 삭제하시겠습니까?",
       "",
       [
         {
           text: "예",
-          onPress: () => {
-            setFoodItems(prevItems => {
-              const updatedItems = { ...prevItems };
-              updatedItems[date] = updatedItems[date].filter(item => item.foodName !== selectedFoodName);
-              if (updatedItems[date].length === 0) {
-                delete updatedItems[date];
-                navigation.navigate('Cal', { date });
-              } else {
-                setSelectedFoodName('전체 메뉴'); // 전체 메뉴로 변경
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem('accessToken');
+              if (!token) {
+                throw new Error('Token not found');
               }
-              return updatedItems;
-            });
+
+              const response = await fetch(`http://ec2-43-203-68-109.ap-northeast-2.compute.amazonaws.com:8000/diet/meals/${selectedItem.dietSeq}/`, {
+                method: 'DELETE',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                console.error('응답 오류:', response.status, errorText);
+                throw new Error(`네트워크 응답이 올바르지 않습니다. 상태 코드: ${response.status}, 오류 메시지: ${errorText}`);
+              }
+  
+              Alert.alert('성공', '식사가 성공적으로 삭제되었습니다.');
+  
+              // 데이터 삭제 후 최신 데이터를 다시 로드
+              await fetchFoodItems(selectedDate);
+  
+              // 삭제 후 '전체 메뉴'로 변경
+              setSelectedFoodName('전체 메뉴');
+  
+            } catch (error) {
+              console.error('오류 발생:', error);
+              Alert.alert('오류', '식사를 삭제하는 도중 오류가 발생했습니다.');
+            }
           },
           style: "destructive"
         },
@@ -230,7 +406,7 @@ const FoodList = () => {
   };
 
   const handleEditPress = () => {
-    navigation.navigate('FoodListModify', { date, ...selectedItem });
+    navigation.navigate('FoodListModify', { date: selectedDate, foodName: selectedFoodName, calories: selectedItem.kcal, carbohydrates: selectedItem.carbo, protein: selectedItem.protein, fat: selectedItem.prov, dietSeq: selectedItem.dietSeq });
   };
 
   const goHome = () => {
@@ -261,72 +437,83 @@ const FoodList = () => {
         highlightDateNameStyle={{ color: '#ff6347' }}
         disabledDateNameStyle={{ color: 'grey' }}
         disabledDateNumberStyle={{ color: 'grey' }}
+        scrollToOnSetSelectedDate={false}
+        selectedDate={moment(selectedDate)}
+        onDateSelected={handleDateSelect}
       />
-      <Image source={require('./assets/default_food.png')} style={styles.foodImage} />
-
-      <View style={styles.foodInfoContainer}>
-        <TouchableOpacity style={styles.foodNameBox} onPress={handleMenuToggle}>
-          <Text style={styles.foodName}>{selectedFoodName}</Text>
-          <Text style={styles.dropdownIcon}>{menuVisible ? '▲' : '▼'}</Text>
-        </TouchableOpacity>
-        {menuVisible && (
-          <View style={styles.menuContainer}>
-            <FlatList
-              data={menuItems}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuSelect(item)}>
-                  <Text style={styles.menuItemText}>{item.name}</Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.id}
-            />
-          </View>
-        )}
-      </View>
-
-      {selectedFoodName === '전체 메뉴' ? (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.chartContainer}>
-            <Svg width={width * 0.65} height={width * 0.65} viewBox="-65 -65 130 130">
-              <G>
-                {pieSlices}
-              </G>
-            </Svg>
-          </View>
-        </ScrollView>
-      ) : (
-        <View style={styles.foodDetailsContainer}>
-          <View style={styles.foodDetails}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>칼로리</Text>
-              <View style={styles.input}>
-                <Text>{selectedItem.calories || 0}</Text>
-                <Text style={styles.unitText}>kcal</Text>
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>탄수화물</Text>
-              <View style={styles.input}>
-                <Text>{selectedItem.carbohydrates || 0}</Text>
-                <Text style={styles.unitText}>g</Text>
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>단백질</Text>
-              <View style={styles.input}>
-                <Text>{selectedItem.protein || 0}</Text>
-                <Text style={styles.unitText}>g</Text>
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>지방</Text>
-              <View style={styles.input}>
-                <Text>{selectedItem.fat || 0}</Text>
-                <Text style={styles.unitText}>g</Text>
-              </View>
-            </View>
-          </View>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
         </View>
+      ) : (
+        <>
+          <Image source={require('./assets/default_food.png')} style={styles.foodImage} />
+
+          <View style={styles.foodInfoContainer}>
+            <TouchableOpacity style={styles.foodNameBox} onPress={handleMenuToggle}>
+              <Text style={styles.foodName}>{selectedFoodName}</Text>
+              <Text style={styles.dropdownIcon}>{menuVisible ? '▲' : '▼'}</Text>
+            </TouchableOpacity>
+            {menuVisible && (
+              <View style={styles.menuContainer}>
+                <FlatList
+                  data={menuItems}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuSelect(item)}>
+                      <Text style={styles.menuItemText}>{item.name}</Text>
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={(item, index) => (item.id ? item.id.toString() : index.toString())} // id가 없으면 index를 사용
+                />
+              </View>
+            )}
+          </View>
+
+          {selectedFoodName === '전체 메뉴' ? (
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+              <View style={styles.chartContainer}>
+                <Svg width={width * 0.65} height={width * 0.65} viewBox="-65 -65 130 130">
+                  <G>
+                    {pieSlices}
+                  </G>
+                </Svg>
+              </View>
+            </ScrollView>
+          ) : (
+            <View style={styles.foodDetailsContainer}>
+              <View style={styles.foodDetails}>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>칼로리</Text>
+                  <View style={styles.input}>
+                    <Text>{selectedItem.kcal || 0}</Text>
+                    <Text style={styles.unitText}>kcal</Text>
+                  </View>
+                </View>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>탄수화물</Text>
+                  <View style={styles.input}>
+                    <Text>{selectedItem.carbo || 0}</Text>
+                    <Text style={styles.unitText}>g</Text>
+                  </View>
+                </View>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>단백질</Text>
+                  <View style={styles.input}>
+                    <Text>{selectedItem.protein || 0}</Text>
+                    <Text style={styles.unitText}>g</Text>
+                  </View>
+                </View>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>지방</Text>
+                  <View style={styles.input}>
+                    <Text>{selectedItem.prov || 0}</Text>
+                    <Text style={styles.unitText}>g</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          )}
+        </>
       )}
 
       {showOptions ? (

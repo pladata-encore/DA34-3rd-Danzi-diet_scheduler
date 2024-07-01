@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Alert,ScrollView } from 'react-native';
 import { MainPagestyles } from './styles/MainPagestyles'; 
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { mainInfo } from './Api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MainPage({ navigation }) {
   const [Dday, setDday] = useState('');               // goal_day - today = dday 
@@ -65,6 +66,7 @@ export default function MainPage({ navigation }) {
 
         <View style={MainPagestyles.progressContainer}>
           <View style={MainPagestyles.progressBar}>
+          <ScrollView>
             <Text style={MainPagestyles.progressLabel}>섭취 칼로리</Text>
             <View style={MainPagestyles.progressBarBackground}>
               <View style={{...MainPagestyles.progress, width: `${(kcal / {daily_kcal}) * 100}%`}} />
@@ -88,6 +90,7 @@ export default function MainPage({ navigation }) {
               <View style={{...MainPagestyles.progress, width: `${(gi / {daily_prov}) * 100}%`}} />
             </View>
             <Text style={MainPagestyles.progressValue}>{gi}/{daily_prov}g</Text>
+            </ScrollView>
           </View>
         </View>
 

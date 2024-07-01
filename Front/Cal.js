@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import styles from './styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Cal() {
   const [showOptions, setShowOptions] = useState(false);
@@ -12,6 +13,7 @@ export default function Cal() {
   const navigation = useNavigation();
   const route = useRoute();
   const { date } = route.params; // 선택한 날짜를 받아옴
+  const config = require('./config');
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
@@ -61,8 +63,7 @@ export default function Cal() {
       });
 
       console.log('Selected camera image saved to:', newPath);
-      Alert.alert('카메라 이미지', `이미지가 저장되었습니다`);
-      setSelectedImage(newPath); // 선택된 이미지 URI 설정
+      await handleImageUpload(newPath); // 이미지 업로드 및 응답 처리
     } catch (error) {
       console.error('카메라 실행 중 오류 발생:', error);
       Alert.alert('오류', '카메라를 여는 도중 문제가 발생했습니다.');
@@ -105,11 +106,55 @@ export default function Cal() {
       });
 
       console.log('Selected gallery image saved to:', newPath);
-      Alert.alert('갤러리 이미지', `이미지가 저장되었습니다`);
-      setSelectedImage(newPath); // Set the selected image URI
+      await handleImageUpload(newPath); // 이미지 업로드 및 응답 처리
     } catch (error) {
       console.error('Error saving the image:', error);
       Alert.alert('저장 오류', '이미지를 저장하는 데 실패했습니다.');
+    }
+  };
+
+  const handleImageUpload = async (imagePath) => {
+    try {
+      const formData = new FormData();
+      formData.append('img', {
+        uri: imagePath,
+        name: imagePath.split('/').pop(),
+        type: 'image/jpg' // 이미지 타입에 따라 변경 가능
+      });
+
+      const token = await AsyncStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+      const response = await fetch('http://ec2-43-203-68-109.ap-northeast-2.compute.amazonaws.com:8000/diet/record/image/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('응답 오류:', response.status, errorText);
+        throw new Error(`네트워크 응답이 올바르지 않습니다. 상태 코드: ${response.status}, 오류 메시지: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('서버 응답 데이터:', data); // 응답 데이터를 로그에 출력
+      navigation.navigate('AddText', {
+        date: date,
+        foodName: data.food_name,
+        calories: data.calories,
+        weight: data.weight,
+        carbohydrates: data.carbohydrate,
+        protein: data.protein,
+        fat: data.fat,
+      });
+    } catch (error) {
+      console.error('이미지 업로드 중 오류 발생:', error);
+      Alert.alert('오류', '이미지를 업로드하는 도중 문제가 발생했습니다.');
     }
   };
 

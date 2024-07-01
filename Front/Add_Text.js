@@ -1,9 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import { FoodContext } from './FoodContext'; // 생성한 FoodContext 임포트
 import styles from './styles_text';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Add_Text = () => {
   const { addFoodItem } = useContext(FoodContext);
@@ -21,20 +22,59 @@ const Add_Text = () => {
 
   useEffect(() => {
     if (isFocused) {
-      // 화면이 포커스될 때 상태 초기화
-      setFoodName('');
-      setCalories('');
-      setWeight('');
-      setCarbohydrates('');
-      setProtein('');
-      setFat('');
+      // 화면이 포커스될 때 상태 초기화 또는 경로에서 받은 값으로 설정
+      setFoodName(route.params?.foodName ? route.params.foodName.toString() : '');
+      setCalories(route.params?.calories ? route.params.calories.toString() : '');
+      setWeight(route.params?.weight ? route.params.weight.toString() : '');
+      setCarbohydrates(route.params?.carbohydrates ? route.params.carbohydrates.toString() : '');
+      setProtein(route.params?.protein ? route.params.protein.toString() : '');
+      setFat(route.params?.fat ? route.params.fat.toString() : '');
     }
-  }, [isFocused]);
+  }, [isFocused, route.params]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const foodItem = { date, foodName, calories, weight, carbohydrates, protein, fat };
     addFoodItem(date, foodItem); // 날짜와 함께 컨텍스트에 음식 정보 추가
-    navigation.navigate('FoodList', { date }); // FoodList 화면으로 이동할 때 날짜 전달
+
+    // API 요청 보내기
+    try {
+      const body = {
+        name: foodName,
+        quantity: parseInt(weight),
+        kcal: parseInt(calories),
+        carbo: parseInt(carbohydrates),
+        protein: parseInt(protein),
+        prov: parseInt(fat),
+        date: new Date(date).toISOString(),
+      };
+
+      const token = await AsyncStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+      const response = await fetch('http://ec2-43-203-68-109.ap-northeast-2.compute.amazonaws.com:8000/diet/meals/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`, // 여기에 토큰을 직접 입력해 주세요
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('응답 오류:', response.status, errorText);
+        throw new Error(`네트워크 응답이 올바르지 않습니다. 상태 코드: ${response.status}, 오류 메시지: ${errorText}`);
+      }
+
+      const data = await response.json();
+      Alert.alert('성공', '다이어트 기록이 성공적으로 추가되었습니다.');
+      navigation.navigate('FoodList', { date, diet_seq: data.diet_seq }); // FoodList 화면으로 이동
+    } catch (error) {
+      console.error('오류 발생:', error);
+      Alert.alert('오류', '다이어트 기록을 추가하는 도중 오류가 발생했습니다.');
+    }
   };
 
   const goHome = () => {
