@@ -1,5 +1,6 @@
-import { StyleSheet } from 'react-native';   //Dimensions 화면 크기 조절 할 때 사용 
+import { StyleSheet, Dimensions } from 'react-native';   //Dimensions 화면 크기 조절 할 때 사용 
 
+const windowWidth = Dimensions.get('window').width;
 
 export const MyPagestyles = StyleSheet.create({
     container: {
@@ -29,9 +30,9 @@ export const MyPagestyles = StyleSheet.create({
       fontWeight: 'bold',
     },
     infoSection: {
-      padding: 16,
+      padding: 20,
       borderRadius: 8,
-      marginBottom: 16,
+      marginBottom: 5,
     },
     infoGrid: {
       flexDirection: 'row',
@@ -51,15 +52,15 @@ export const MyPagestyles = StyleSheet.create({
     label: {
       fontSize: 16,
       marginBottom: 2,
-      color: '#D6BDF6',
+      color: '#c8a3f7',
       fontWeight: 'bold',
     },
     value: {
       fontSize: 14,
-      color: 'gray',
+      color: '#6f6d70',
     },
     dietBox: {
-      width: '100%',
+      width: windowWidth * 0.8,
       backgroundColor: '#FFFFFF',
       padding: 15,
       borderRadius: 10,
@@ -71,13 +72,13 @@ export const MyPagestyles = StyleSheet.create({
     appSettings: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: 5,
-      padding: 13,
+      marginBottom: 10,
+      padding: 5,
     },
     button: {
       width: '48%',
-      backgroundColor: '#D3D3D3',
-      padding: 8,
+      backgroundColor: '#8f8f8f',
+      padding: 10,
       borderRadius: 8,
     },
     buttonText: {
@@ -89,20 +90,20 @@ export const MyPagestyles = StyleSheet.create({
     Mymodify: {
       position: 'absolute',   //특정위치에 고정시키기 위해 사용 
       right: 25,   //right, top: 방향키 역할 
-      top: 95,
+      top: 110,
       width: 30,
       height: 30,
     },
     dietmodify: {
       position: 'absolute',   //특정위치에 고정시키기 위해 사용 
       right: 25,   //right, top: 방향키 역할 
-      top: 350,
+      top: 345,
       width: 30,
       height: 30,
     },    
     icon: {
-      width: 30,
-      height: 30,
+      width: 25,
+      height: 25,
     },
     navigation: {
       position: 'absolute',
@@ -123,5 +124,6 @@ export const MyPagestyles = StyleSheet.create({
       width: 30,
       height: 30,
     },
+
 }
 )

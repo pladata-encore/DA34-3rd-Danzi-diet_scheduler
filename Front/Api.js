@@ -103,11 +103,27 @@ export const userdelete = async () => {
 export const mainInfo = async (date) => {
   try {
     const userInfoResponse = await apiClient.get('/user/diet_info/');
-    const mealInfoREsponse = await apiClient.get('/diet/daily_meals/by-date/', { params: { date }});
-    return {
-      ...userInfoResponse.data,
-      ...mealInfoREsponse.data,
+    console.log('UserInfoResponse:', userInfoResponse.data);
+
+    console.log('Request Date:', date);
+    const mealInfoREsponse = await apiClient.get('/diet/daily_meals/by-date/', { params: { date }}); 
+    console.log('MealInfoResponse:', mealInfoREsponse.data);
+
+    const mainuserInfo = {
+      goal_dt: userInfoResponse.data.goal_dt,
+      weight: userInfoResponse.data.weight,
+      goal_weight: userInfoResponse.data.goal_weight,
+      kcal: mealInfoREsponse.data.kcal,
+      carbo: mealInfoREsponse.data.carbo,
+      protein: mealInfoREsponse.data.protein,
+      prov: mealInfoREsponse.data.prov,
+      daily_kcal: userInfoResponse.data.daily_kcal,
+      daily_carbo: userInfoResponse.data.daily_carbo,
+      daily_protein: userInfoResponse.data.daily_protein,
+      daily_prov: userInfoResponse.data.daily_prov,
     };
+
+    return mainuserInfo;
   } catch (error) {
     handleError(error);
   }
@@ -164,6 +180,24 @@ export const mydietinfo = async () => {
   }
 };
 
+//Insight-pie chart
+export const insightpie = async () => {
+  try {
+    const totalResponse = await apiClient.get('/user/diet_info/');
+    console.log('total_kcal:', totalResponse.data.total_kcal);
+    const kcalsumResponse = await apiClient.get('/diet/progress/');
+    console.log('kcal_difference_sum:', kcalsumResponse.data.kcal_difference_sum);
+
+    const kcalInfo = {
+      total_kcal: totalResponse.data.total_kcal,
+      kcal_difference_sum: kcalsumResponse.data.kcal_difference_sum,
+    };
+
+    return kcalInfo;
+  } catch (error) {
+    handleError(error)
+  }
+};
 
 // 에러 핸들링 함수
 const handleError = (error) => {

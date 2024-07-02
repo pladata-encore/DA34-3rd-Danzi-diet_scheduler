@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';   //Dimensions 화면 크기 조절 할 때 사용 
 
-
 export const MainPagestyles  = StyleSheet.create({
   container: {
     flex: 1,
@@ -12,7 +11,7 @@ export const MainPagestyles  = StyleSheet.create({
     backgroundColor: '#D6BDF6',
     width: '100%', // 헤더가 화면 전체 너비를 차지하게 설정
     paddingTop: 70, // 상단 패딩을 추가하여 헤더 내부 내용물 배치
-    paddingBottom: 170, // 하단 패딩을 추가하여 헤더 내부 내용물 배치
+    paddingBottom: 150, // 하단 패딩을 추가하여 헤더 내부 내용물 배치
     alignItems: 'center',  // 텍스트 정렬
     position: 'absolute', // 절대 위치 지정
     top: 0, // 화면 맨 위쪽에 위치
@@ -31,18 +30,18 @@ export const MainPagestyles  = StyleSheet.create({
     borderColor: '#885858',
     borderWidth: 1,
     borderRadius: 250,   // 사각형을 원으로 만듬 
-    top: 200,            // 위치 이동할 때 사용 
+    top: 160,            // 위치 이동할 때 사용 
     height: 250,
     width: 250, 
     justifyContent: 'center', // 수직 중앙 정렬
     alignItems: 'center', // 수평 중앙 정렬
   },
   goalweight: {
-    fontSize: 30,
+    fontSize: 25,
     color: '#885858',
   },
   nowweight: {
-    fontSize: 40,
+    fontSize:35,
     color: 'black',
   },
   progressContainer: {
@@ -52,10 +51,10 @@ export const MainPagestyles  = StyleSheet.create({
   },
   progressBar: {
     position: 'absolute',
-    top: 430,
+    top: 370,
   },
   progressLabel: {
-    fontSize: 20,
+    fontSize: 15,
     marginBottom: 5,
     textAlign: 'left', 
   },

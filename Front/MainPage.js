@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Alert,ScrollView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, Text, Image, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { MainPagestyles } from './styles/MainPagestyles'; 
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { mainInfo } from './Api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MainPage({ navigation }) {
-  const [Dday, setDday] = useState('');               // goal_day - today = dday 
+  const [Dday, setDday] = useState('');               
   const [weight, setWeight] = useState('');           // 현재, 목표 체중은 값 불러오기 
   const [goal_weight, setGoalWeight] = useState('');
   
   const [kcal, setKcal] = useState('');               // 칼로리, 탄수화물, 단백질, 지방: user가 섭취한 값 
-  const [tan, setTan] = useState('');
-  const [dan, setDan] = useState('');
-  const [gi, setGi] = useState('');
+  const [carbo, setcarbo] = useState('');
+  const [protein, setprotein] = useState('');
+  const [prov, setprov] = useState('');
 
-  const [daily_kcal, setdaily_kcal] = useState('');      //칼로리, 탄수화물, 단백질, 지방: user 목표 기준값 
-  const [daily_carbo, setdaily_carbo] = useState('');
-  const [daily_protein, setdaily_protein] = useState('');
-  const [daily_prov, setdaily_prov] = useState('');
+  const [daily_kcal, setDailyKcal] = useState('');      //칼로리, 탄수화물, 단백질, 지방: user 목표 기준값 
+  const [daily_carbo, setDailyCarbo] = useState('');
+  const [daily_protein, setDailyProtein] = useState('');
+  const [daily_prov, setDailyProv] = useState('');
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     const fetchMainInfo = async () => {
       try {
         const today = new Date().toISOString().split('T')[0]; // 오늘 날짜를 ISO 형식으로
@@ -28,9 +29,9 @@ export default function MainPage({ navigation }) {
         setWeight(data.weight);
         setGoalWeight(data.goal_weight);
         setKcal(data.kcal);
-        setTan(data.tan);
-        setDan(data.dan);
-        setGi(data.gi);
+        setcarbo(data.carbo);
+        setprotein(data.protein);
+        setprov(data.prov);
         setDailyKcal(data.daily_kcal);
         setDailyCarbo(data.daily_carbo);
         setDailyProtein(data.daily_protein);
@@ -39,10 +40,24 @@ export default function MainPage({ navigation }) {
         // D-day 계산
         const goalDate = new Date(data.goal_dt);
         const todayDate = new Date();
+
+        if (isNaN(goalDate.getTime())) {
+          console.log('Invalid goalDate:', data.goal_dt);
+          setDday('Invalid date');
+          return;
+        }
+
         const diffTime = Math.abs(goalDate - todayDate);
+        console.log('goalDate:', goalDate);
+        console.log('todayDate:', todayDate);
+        console.log('diffTime:', diffTime);
+
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
         setDday(diffDays);
+        console.log('D-day:', diffDays);
+        
       } catch (error) {
+        console.error('Error fetching main info:', error);
         Alert.alert('오류', '데이터를 불러오는 중 오류가 발생했습니다.', [
           { text: '확인' }
         ]);
@@ -50,7 +65,8 @@ export default function MainPage({ navigation }) {
     };
 
     fetchMainInfo();
-  }, []);
+  }, [])
+);
 
   return (
     <SafeAreaProvider>
@@ -69,27 +85,27 @@ export default function MainPage({ navigation }) {
           <ScrollView>
             <Text style={MainPagestyles.progressLabel}>섭취 칼로리</Text>
             <View style={MainPagestyles.progressBarBackground}>
-              <View style={{...MainPagestyles.progress, width: `${(kcal / {daily_kcal}) * 100}%`}} />
+              <View style={{...MainPagestyles.progress, width: `${(kcal / daily_kcal) * 100}%`}} />
             </View>
             <Text style={MainPagestyles.progressValue}>{kcal}/{daily_kcal}kcal</Text>
 
             <Text style={MainPagestyles.progressLabel}>섭취 탄수화물</Text>
             <View style={MainPagestyles.progressBarBackground}>
-              <View style={{...MainPagestyles.progress, width: `${(tan / {daily_carbo}) * 100}%`}} />
+              <View style={{...MainPagestyles.progress, width: `${(carbo / daily_carbo) * 100}%`}} />
             </View>
-            <Text style={MainPagestyles.progressValue}>{tan}/{daily_carbo}g</Text>
+            <Text style={MainPagestyles.progressValue}>{carbo}/{daily_carbo}g</Text>
 
             <Text style={MainPagestyles.progressLabel}>섭취 단백질</Text>
             <View style={MainPagestyles.progressBarBackground}>
-              <View style={{...MainPagestyles.progress, width: `${(dan / {daily_protein}) * 100}%`}} />
+              <View style={{...MainPagestyles.progress, width: `${(protein / daily_protein) * 100}%`}} />
             </View>
-            <Text style={MainPagestyles.progressValue}>{dan}/{daily_protein}g</Text>
+            <Text style={MainPagestyles.progressValue}>{protein}/{daily_protein}g</Text>
 
             <Text style={MainPagestyles.progressLabel}>섭취 지방</Text>
             <View style={MainPagestyles.progressBarBackground}>
-              <View style={{...MainPagestyles.progress, width: `${(gi / {daily_prov}) * 100}%`}} />
+              <View style={{...MainPagestyles.progress, width: `${(prov / daily_prov) * 100}%`}} />
             </View>
-            <Text style={MainPagestyles.progressValue}>{gi}/{daily_prov}g</Text>
+            <Text style={MainPagestyles.progressValue}>{prov}/{daily_prov}g</Text>
             </ScrollView>
           </View>
         </View>

@@ -146,10 +146,13 @@ export default function MyPage({ navigation }) {
           <View style={MyPagestyles.dietBox}>
             <Text style={MyPagestyles.label}>목표체중</Text>
             <Text style={MyPagestyles.value}>{userInfo.goal_weight}</Text>
+            <Text></Text>
             <Text style={MyPagestyles.label}>다이어트 시작일</Text>
             <Text style={MyPagestyles.value}>{formatStartDate(userInfo.start_dt)}</Text>
+            <Text></Text>
             <Text style={MyPagestyles.label}>다이어트 목표일</Text>
             <Text style={MyPagestyles.value}>{formatGoalDate(userInfo.goal_dt)}</Text>
+            <Text></Text>
             <Text style={MyPagestyles.label}>하루 권장 섭취 칼로리</Text>
             <Text style={MyPagestyles.value}>{userInfo.daily_kcal}</Text>
           </View>
