@@ -54,7 +54,7 @@ const CalendarScreen = () => {
           Alert.alert('Error', '데이터를 불러오는 도중 문제가 발생했습니다.');
         }
       } catch (error) {
-        Alert.alert('Error', '서버와 통신하는 도중 오류가 발생했습니다.');
+        // Alert.alert('Error', '서버와 통신하는 도중 오류가 발생했습니다.');
       }
     };
 

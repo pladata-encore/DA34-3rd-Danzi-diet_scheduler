@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { TextInput, View, Text, TouchableOpacity, Alert,ScrollView } from 'react-native';
 import { DietInfostyles } from './styles/dietInfostyles';
 import Slider from '@react-native-community/slider';
 import { submitDietInfo } from './Api';
@@ -105,6 +105,7 @@ export default function DietInfo({ navigation }) {
     return (
         <View style={DietInfostyles.container}>
             <View style={DietInfostyles.formContainer}>
+            <ScrollView>
                 {nextPage === 1 ? (
                     <>
                         <Text style={DietInfostyles.title}>Start with On:ly</Text>
@@ -201,7 +202,9 @@ export default function DietInfo({ navigation }) {
                         </TouchableOpacity>
                     </>
                 )}
+                </ScrollView>
             </View>
         </View>
+        
     );
 }

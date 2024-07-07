@@ -102,30 +102,65 @@ export const userdelete = async () => {
 //mainpage (user정보+현재까지 먹은 칼로리 정보)
 export const mainInfo = async (date) => {
   try {
+    token = await AsyncStorage.getItem('accessToken')
+
     const userInfoResponse = await apiClient.get('/user/diet_info/');
     console.log('UserInfoResponse:', userInfoResponse.data);
-
+    // console.log('token:', token);  
+    
     console.log('Request Date:', date);
-    const mealInfoREsponse = await apiClient.get('/diet/daily_meals/by-date/', { params: { date }}); 
-    console.log('MealInfoResponse:', mealInfoREsponse.data);
+    const mealInfoResponse = await apiClient.get('/diet/daily_meals/by-date/', { params: { date }}); 
+    console.log('MealInfoResponse:', mealInfoResponse.data);
+    // console.log('token:', token);  
+    
+    let kcal = 0;
+    let carbo = 0;
+    let protein = 0;
+    let prov = 0;
+
+    if (!mealInfoResponse.data.error) {
+      kcal = mealInfoResponse.data.kcal || 0;
+      carbo = mealInfoResponse.data.carbo || 0;
+      protein = mealInfoResponse.data.protein || 0;
+      prov = mealInfoResponse.data.prov || 0;
+    }
 
     const mainuserInfo = {
       goal_dt: userInfoResponse.data.goal_dt,
       weight: userInfoResponse.data.weight,
       goal_weight: userInfoResponse.data.goal_weight,
-      kcal: mealInfoREsponse.data.kcal,
-      carbo: mealInfoREsponse.data.carbo,
-      protein: mealInfoREsponse.data.protein,
-      prov: mealInfoREsponse.data.prov,
+      kcal,
+      carbo,
+      protein,
+      prov,
       daily_kcal: userInfoResponse.data.daily_kcal,
       daily_carbo: userInfoResponse.data.daily_carbo,
       daily_protein: userInfoResponse.data.daily_protein,
       daily_prov: userInfoResponse.data.daily_prov,
     };
 
+    
+
     return mainuserInfo;
   } catch (error) {
-    handleError(error);
+    if (error.response && error.response.data.error === "No daily_diets found for the specified date") {
+      const userInfoResponse = await apiClient.get('/user/diet_info/');
+      return {
+        goal_dt: userInfoResponse.data.goal_dt,
+        weight: userInfoResponse.data.weight,
+        goal_weight: userInfoResponse.data.goal_weight,
+        kcal: 0,
+        carbo: 0,
+        protein: 0,
+        prov: 0,
+        daily_kcal: userInfoResponse.data.daily_kcal,
+        daily_carbo: userInfoResponse.data.daily_carbo,
+        daily_protein: userInfoResponse.data.daily_protein,
+        daily_prov: userInfoResponse.data.daily_prov,
+      };
+    } else {
+      handleError(error);
+    }
   }
 };
 

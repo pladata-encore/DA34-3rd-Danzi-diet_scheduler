@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { TextInput, View, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { SignupFormstyles } from './styles/SignupFormstyles'; 
 import { registerUser, checkUserID } from './Api';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
@@ -93,6 +93,7 @@ export default function SignupForm({ navigation }) {
     <SafeAreaProvider>
       <SafeAreaView style={SignupFormstyles.container}>
         <View style={SignupFormstyles.formContainer}>
+        <ScrollView>
           <Text style={SignupFormstyles.title}>회원가입</Text>
           <Text style={SignupFormstyles.subtitle}>On:ly 회원이 되어 다양한 혜택을 경험해 보세요!</Text>
 
@@ -198,8 +199,10 @@ export default function SignupForm({ navigation }) {
           <TouchableOpacity style={SignupFormstyles.ButtonContainer} onPress={handleSignup}>
               <View style={SignupFormstyles.signupButton}>
                 <Text style={SignupFormstyles.signupButtonText}> 회원 가입 완료 </Text>
+                
               </View>
           </TouchableOpacity>
+          </ScrollView>
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
