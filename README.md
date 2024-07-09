@@ -4,35 +4,35 @@ Member : 허동우, 김유리, 류가연, 송대선, 정지윤
 ### Application name
 ![앱 로고 small](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/e8172eb4-06eb-4e85-98ae-a8a0160a4e1a)
 ## 목차
-- [프로젝트 소개](#프로젝트 소개)
-- [팀원 소개](#팀원 소개)
-- [개발 환경](#개발 환경)
-- [모델 개발](#모델 개발)
-- [기능 소개](#기능 소개)
-- [설계 문서](#설계 문서)
-- [기술 스택](#기술 스택)
+- [프로젝트 소개](#1-프로젝트-소개)
+- [팀원 소개](#2-팀원-소개)
+- [개발 환경](#3-개발-환경)
+- [모델 개발](#4-모델-개발)
+- [기능 소개](#5-기능-소개)
+- [설계 문서](#6-설계-문서)
+- [기술 스택](#7-기술-스택)
 
-### 1. 프로젝트 소개
+## 1. 프로젝트 소개
 다이어트 스케쥴러는 체계적인 식단 관리와 운동 기록을 통해 사용자가 건강하게 체중을 감량할 수 있도록 돕는 어플리케이션입니다. 이 앱은 사용자의 일일 칼로리 섭취량과 운동량을 기반으로 맞춤형 다이어트 계획을 제공하며, 딥러닝 모델을 활용한 식단 인식을 통해 더욱 정확한 데이터를 제공합니다.
 
-#### 1-1. 주요 기능
+### 1-1. 주요 기능
   - 식단 기록: 딥러닝 모델을 활용한 식단 사진 인식으로 음식명, 무게, 탄수화물, 단백질, 지방, 칼로리를 자동으로 기록합니다.
   - 칼로리 처방: 사용자의 키, 몸무게, 목표 체중, 활동량 등을 기반으로 일일 섭취 칼로리와 탄단지 비율을 계산하여 제공합니다.
   - D-day 기록: 사용자의 섭취 칼로리와 권장 칼로리 섭취량을 비교하여 다이어트 목표일을 조정해줍니다.
   - 통계 시각화: 일일 칼로리, 탄수화물, 단백질, 지방 섭취량을 그래프로 시각화하여 한눈에 확인할 수 있습니다.
-#### 1-2. 프로젝트 목표
+### 1-2. 프로젝트 목표
   - 딥러닝 모델 정확도 95% 달성
   - 건강한 식단을 통한 효과적인 다이어트
-#### 1-3. 기대 효과
+### 1-3. 기대 효과
   - 체계적인 식단 및 운동 관리로 건강한 다이어트 실현
   - 맞춤형 칼로리 및 영양소 처방으로 체중 감량 목표 달성
   - 그래프를 통한 시각적 데이터 제공으로 동기 부여 및 목표 추적
 
-### 2. 팀원 소개
+## 2. 팀원 소개
 ![팀원소개](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/70ff0075-8e49-4094-add6-ca4fe60bae45)
 
-### 3. 개발환경
-#### 3-1. React Native 개발 환경 구축
+## 3. 개발 환경
+### 3-1. React Native 개발 환경 구축
 ```javascript
 "@miblanchard/react-native-slider": "^2.6.0",
 "@react-native-async-storage/async-storage": "^1.23.1",
@@ -59,7 +59,7 @@ Member : 허동우, 김유리, 류가연, 송대선, 정지윤
 "styled-components": "^6.1.11"
 ```
 
-#### 3-2. Django 개발 환경 구축
+### 3-2. Django 개발 환경 구축
 ```plaintext
 absl-py==2.1.0
 asgiref==3.8.1
@@ -144,23 +144,22 @@ Werkzeug==3.0.3
 wrapt==1.14.1
 ```
 
-#### 3-3. EC2 인스턴스에서 프로젝트를 실행하기 위한 백엔드 개발 환경을 구축
-#### 1). EC2 인스턴스에 SSH 접속
+### 3-3. EC2 인스턴스에서 프로젝트를 실행하기 위한 백엔드 개발 환경을 구축
+### 1). EC2 인스턴스에 SSH 접속
 
-##### (1). **Putty 설정**:
+#### (1). **Putty 설정**:
     - `.ppk` 파일을 사용하여 Putty를 통해 EC2 인스턴스에 접속합니다.
     - "login as:" 메시지가 나타나면 `ubuntu`를 입력합니다.
 
-#### 2). Git으로 프로젝트 클론
+### 2). Git으로 프로젝트 클론
 
-##### (1). **프로젝트 클론**:
-    ```sh
+#### (1). **프로젝트 클론**:
     git clone https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler.git
     cd diet2
 
-#### 3). 가상환경 설정 및 패키지 설치
+### 3). 가상환경 설정 및 패키지 설치
 
-##### (1). **가상환경 설정**:
+#### (1). **가상환경 설정**:
     sudo apt-get update
     sudo apt-get install software-properties-common
     sudo add-apt-repository ppa:deadsnakes/ppa
@@ -171,7 +170,7 @@ wrapt==1.14.1
     pip install --upgrade pip setuptools
 
 
-##### (2). **필요한 패키지 설치**:
+#### (2). **필요한 패키지 설치**:
     sudo apt-get update
     sudo apt-get install pkg-config
     sudo apt-get install build-essential libmysqlclient-dev
@@ -181,58 +180,58 @@ wrapt==1.14.1
     pip install -r requirements.txt
 
     
-##### (3). **방화벽 설정**:
+#### (3). **방화벽 설정**:
     sudo ufw allow 8000/tcp
     sudo ufw enable
     sudo ufw status
 
-### 4. 모델 개발
-#### 4-1. 객체 탐지 모델
+## 4. 모델 개발
+### 4-1. 객체 탐지 모델
   - YoloV3를 기반으로 모델 학습
   - 아래의 학습 History 참고
     
 ![객체 탐지 history)](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/ca6dea84-9ace-44d1-b978-de9a016ef665)
 
 
-#### 4-2. 음식 분류 모델
+### 4-2. 음식 분류 모델
   - ResNet152V2를 기반으로 모델 학습
   - 100여가지의 음식 메뉴를 학습
 
 ![음식 분류 모델 구조](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/ade03c17-19da-4944-83e1-6c3457aa9fd5)
 
-#### 4-3. 음식량 추정 모델
+### 4-3. 음식량 추정 모델
   - ResNet152V2를 기반으로 모델 학습
     
 ![음식량 추정 모델 구조](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/6c9b633d-781e-4e1a-950a-b2a5a3d374cd)
     
-### 5. 기능 소개
-#### 5-1. 회원가입
+## 5. 기능 소개
+### 5-1. 회원가입
 
-#### 5-2. 로그인 및 다이어트 정보 입력
+### 5-2. 로그인 및 다이어트 정보 입력
 
-#### 5-3. 식단 정보 입력(텍스트)
+### 5-3. 식단 정보 입력(텍스트)
 
-#### 5-4. 식단 정보 입력 (갤러리)
+### 5-4. 식단 정보 입력 (갤러리)
 
-#### 5-5. 식단 정보 수정
+### 5-5. 식단 정보 수정
 
-#### 5-6. 식단 정보 삭제
+### 5-6. 식단 정보 삭제
 
-#### 5-6. 다이어트 진행상황
+### 5-6. 다이어트 진행상황
 
-#### 5-7. 회원정보 수정 및 로그아웃
+### 5-7. 회원정보 수정 및 로그아웃
 
 
-### 6. 설계 문서
-#### 6-1. System Architecture
+## 6. 설계 문서
+### 6-1. System Architecture
 ![시스템 아키텍쳐](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/675f75fd-1682-4e1a-936d-d58f1685593d)
-#### 6-1. Wire Frame
+### 6-1. Wire Frame
 ![와이어프레임](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/d7b2dbe4-edf9-4669-b59a-2c1765d15023)
-#### 6-1. ERD
+### 6-1. ERD
 ![ERD](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/46a2bdf8-c23e-44e2-a896-7ccda9c9afa2)
 
-### 7. 기술 스택
-#### 협업 도구
+## 7. 기술 스택
+### 협업 도구
 <p align="center">
     <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/>
     <img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/>
@@ -241,7 +240,7 @@ wrapt==1.14.1
     <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/>
 </p>
 
-#### 개발 언어 및 프레임워크
+### 개발 언어 및 프레임워크
 <p align="center">
     <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"/>
     <img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
