@@ -205,22 +205,17 @@ wrapt==1.14.1
 ![음식량 추정 모델 구조](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/6c9b633d-781e-4e1a-950a-b2a5a3d374cd)
     
 ## 5. 기능 소개
-### 5-1. 회원가입
+### 5-1. 회원가입 및 로그인
+![로그인및회원가입](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/b50ffff7-0003-4a60-9f4f-e60cb64e5bf2)
 
-### 5-2. 로그인 및 다이어트 정보 입력
+### 5-2. 식단 입력 및 캘린더 화면
+![식단입력캘린더](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/255bda45-2e02-4e85-a710-0ee4457eda59)
 
-### 5-3. 식단 정보 입력(텍스트)
+### 5-3. 식단 정보 수정 및 삭제
+![식단수정및삭제](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/3bdfb11d-53ed-41ff-9944-58a7cb902fea)
 
-### 5-4. 식단 정보 입력 (갤러리)
-
-### 5-5. 식단 정보 수정
-
-### 5-6. 식단 정보 삭제
-
-### 5-6. 다이어트 진행상황
-
-### 5-7. 회원정보 수정 및 로그아웃
-
+### 5-4. 인사이트 및 회원정보 관리
+![인사이트및정보수정및로그아웃](https://github.com/pladata-encore/DA34-3rd-Danzi-diet_scheduler/assets/80755116/508a459c-a092-4b75-8249-8cd1521aadcc)
 
 ## 6. 설계 문서
 ### 6-1. System Architecture
